@@ -91,7 +91,7 @@ Prérequis
 Backend Django
 
 # Cloner le dépôt
-git clone https://github.com/Hamid-LMI/library_project.git
+git clone https://github.com/Hamid-LMI/library_project
 cd library_project
 
 # Créer et activer un environnement virtuel
