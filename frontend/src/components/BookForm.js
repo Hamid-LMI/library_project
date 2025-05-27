@@ -7,7 +7,7 @@ const BookForm = ({ onClose, onSuccess, authors, genres }) => {
         pages: '',
         genre_id: '',
         publication_date: '',
-        author_ids: []
+        author_id: ''
     });
 
     const handleSubmit = async (e) => {
@@ -38,7 +38,7 @@ const BookForm = ({ onClose, onSuccess, authors, genres }) => {
         const selectedAuthors = Array.from(e.target.selectedOptions, option => option.value);
         setFormData({
             ...formData,
-            author_ids: selectedAuthors
+            author_id: selectedAuthors
         });
     };
 
