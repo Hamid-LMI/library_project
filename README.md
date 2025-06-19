@@ -114,11 +114,3 @@ npm install
 npm start
 
 ---
-
-## 📝 TODO
-
-- [ ] Ajouter la **création** de genre côté client
-- [ ] Ajouter la **suppression** de genre côté client
-- [ ] Ajouter la **création** d'auteur côté client
-- [ ] Ajouter la **suppression** d'auteur côté client
-- [ ] Ajouter la **suppression** de livre côté client
