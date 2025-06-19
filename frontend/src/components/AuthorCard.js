@@ -2,7 +2,7 @@ import React from 'react';
 
 const AuthorCard = ({ author, onAuthorClick }) => (
   <div className="col-md-4 mb-4">
-    <div className="card h-100 shadow-sm" style={{cursor: 'pointer'}} onClick={() => onAuthorClick(author.id)}>
+    <div className="card h-100 shadow-sm" style={{ cursor: 'pointer' }} onClick={() => onAuthorClick(author.id)}>
       <div className="card-body">
         <h5 className="card-title text-success">{author.full_name}</h5>
         <p className="card-text">

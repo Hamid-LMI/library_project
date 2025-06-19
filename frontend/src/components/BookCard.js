@@ -1,8 +1,26 @@
 import React from 'react';
 
-const BookCard = ({ book }) => (
+const BookCard = ({ book, onDeleteBookClick, onUpdateBookClick }) => (
     <div className="col-md-4 mb-4">
         <div className="card h-100 shadow-sm">
+            <div className="position-absolute top-0 end-0 p-2 d-flex gap-1">
+                <button
+                    type="button"
+                    className="btn btn-sm btn-light"
+                    aria-label="Edit"
+                    onClick={() => onUpdateBookClick(book)}
+                >
+                    ✏️
+                </button>
+                <button
+                    type="button"
+                    className="btn btn-sm btn-light"
+                    aria-label="Close"
+                    onClick={() => onDeleteBookClick(book.id)}
+                >
+                    ❌
+                </button>
+            </div>
             {book.cover_image && (
                 <img
                     src={book.cover_image}

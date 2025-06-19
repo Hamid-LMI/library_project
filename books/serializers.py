@@ -4,7 +4,7 @@ from .models import Author, Book, Genre
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = '__all__'
+        fields = ['id', 'name']
 
 class AuthorSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
@@ -48,4 +48,4 @@ class AuthorDetailSerializer(serializers.ModelSerializer):
     
     def get_books(self, obj):
         books = obj.books.all().order_by('publication_date')
-        return BookSerializer(books, many=True).data
+        return BookSerializer(books, many=True, context=self.context).data

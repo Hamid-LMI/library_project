@@ -25,15 +25,6 @@ class GenreListCreateView(generics.ListCreateAPIView):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
-@api_view(['GET'])
-def author_books(request, author_id):
-    try:
-        author = Author.objects.get(id=author_id)
-        books = author.books.all().order_by('publication_date')
-        serializer = BookSerializer(books, many=True)
-        return Response({
-            'author': AuthorSerializer(author).data,
-            'books': serializer.data
-        })
-    except Author.DoesNotExist:
-        return Response({'error': 'Author not found'}, status=status.HTTP_404_NOT_FOUND)
+class GenreDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer

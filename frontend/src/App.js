@@ -3,7 +3,12 @@ import api from './services/api';
 import Navigation from './components/Navigation';
 import BookCard from './components/BookCard';
 import AuthorCard from './components/AuthorCard';
+import GenreCard from './components/GenreCard';
+import AuthorForm from './components/AuthorForm';
 import BookForm from './components/BookForm';
+import GenreForm from './components/GenreForm';
+import AuthorDetails from './components/AuthorDetails';
+
 import './App.css';
 
 export default function App() {
@@ -11,9 +16,13 @@ export default function App() {
   const [books, setBooks] = useState([]);
   const [authors, setAuthors] = useState([]);
   const [genres, setGenres] = useState([]);
-  const [selectedAuthor, setSelectedAuthor] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  const [showAuthorForm, setShowAuthorForm] = useState(false);
+  const [showBookForm, setShowBookForm] = useState(false);
+  const [showGenreForm, setShowGenreForm] = useState(false);
+  const [selectedAuthor, setSelectedAuthor] = useState(null);
+  const [selectedGenre, setSelectedGenre] = useState(null);
+  const [selectedBook, setSelectedBook] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -48,6 +57,55 @@ export default function App() {
     setLoading(false);
   };
 
+  const handleDeleteAuthorClick = async (authorId) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
+      try {
+        const authorData = await api.deleteAuthor(authorId);
+        loadData();
+        setCurrentView("authors");
+      } catch (error) {
+        console.error('Erreur lors de la supression de l\'auteur:', error);
+      }
+    }
+  };
+
+  const handleUpdateAuthorClick = (author) => {
+    setSelectedAuthor(author);
+    setShowAuthorForm(true);
+  };
+
+  const handleDeleteGenreClick = async (genreId) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
+      try {
+        const genreData = await api.deleteGenre(genreId);
+        loadData();
+      } catch (error) {
+        console.error('Erreur lors de la supression du genre:', error);
+      }
+    }
+  };
+
+  const handleUpdateGenreClick = (genre) => {
+    setSelectedGenre(genre);
+    setShowGenreForm(true);
+  };
+
+  const handleDeleteBookClick = async (bookId) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
+      try {
+        const bookData = await api.deleteBook(bookId);
+        loadData();
+      } catch (error) {
+        console.error('Erreur lors de la supression du livre:', error);
+      }
+    }
+  };
+
+  const handleUpdateBookClick = (book) => {
+    setSelectedBook(book);
+    setShowBookForm(true);
+  };
+
   const handleViewChange = (view) => {
     setCurrentView(view);
     setSelectedAuthor(null);
@@ -70,24 +128,24 @@ export default function App() {
       <Navigation currentView={currentView} onViewChange={handleViewChange} />
 
       <div className="container">
-        {/* Vue des livres */}
+        {/* Books view */}
         {currentView === 'books' && (
           <>
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h2 className="text-primary">📖 Liste des Livres</h2>
-              <button className="btn btn-success" onClick={() => setShowForm(true)}>
+              <button className="btn btn-success" onClick={() => { setShowBookForm(true); setSelectedBook(null); }}>
                 ➕ Ajouter un livre
               </button>
             </div>
             <div className="row">
               {books.length > 0 ? (
                 books.map(book => (
-                  <BookCard key={book.id} book={book} />
+                  <BookCard key={book.id} book={book} onDeleteBookClick={handleDeleteBookClick} onUpdateBookClick={handleUpdateBookClick} />
                 ))
               ) : (
                 <div className="col-12">
                   <div className="alert alert-info text-center">
-                    Aucun livre trouvé. Utilisez l'interface d'administration Django pour ajouter des livres.
+                    Aucun livre trouvé. Cliquez sur "Ajouter un livre" ou utilisez l'interface d'administration Django pour ajouter des livres.
                   </div>
                 </div>
               )}
@@ -95,10 +153,15 @@ export default function App() {
           </>
         )}
 
-        {/* Vue des auteurs */}
+        {/* Authors view */}
         {currentView === 'authors' && (
           <>
-            <h2 className="text-success mb-4">👤 Liste des Auteurs</h2>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <h2 className="text-success mb-4">👤 Liste des Auteurs</h2>
+              <button className="btn btn-success" onClick={() => { setShowAuthorForm(true); setSelectedAuthor(null); }}>
+                ➕ Ajouter un auteur
+              </button>
+            </div>
             <div className="row">
               {authors.length > 0 ? (
                 authors.map(author => (
@@ -115,36 +178,34 @@ export default function App() {
           </>
         )}
 
-        {/* Détail d'un auteur */}
+        {/* Author details */}
         {currentView === 'author-detail' && selectedAuthor && (
-          <>
-            <div className="mb-4">
-              <button 
-                className="btn btn-outline-secondary mb-3"
-                onClick={() => setCurrentView('authors')}
-              >
-                ← Retour aux auteurs
-              </button>
-              <div className="card">
-                <div className="card-header bg-success text-white">
-                  <h3 className="mb-0">👤 {selectedAuthor.full_name}</h3>
-                </div>
-                <div className="card-body">
-                  <p><strong>Date de naissance:</strong> {new Date(selectedAuthor.birth_date).toLocaleDateString('fr-FR')}</p>
-                </div>
-              </div>
-            </div>
+          <AuthorDetails
+            key={selectedAuthor.id}
+            author={selectedAuthor}
+            onDeleteAuthorClick={handleDeleteAuthorClick}
+            onUpdateAuthorClick={handleUpdateAuthorClick}
+            onBack={() => setCurrentView('authors')} />
+        )}
 
-            <h4 className="text-primary mb-3">📚 Livres de {selectedAuthor.full_name}</h4>
+        {/* Genres view */}
+        {currentView === 'genres' && (
+          <>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <h2 className="text-success mb-4"> 📖 Liste des genres</h2>
+              <button className="btn btn-success" onClick={() => { setShowGenreForm(true); setSelectedGenre(null); }}>
+                ➕ Ajouter un genre
+              </button>
+            </div>
             <div className="row">
-              {selectedAuthor.books && selectedAuthor.books.length > 0 ? (
-                selectedAuthor.books.map(book => (
-                  <BookCard key={book.id} book={book} />
+              {genres.length > 0 ? (
+                genres.map(genre => (
+                  <GenreCard key={genre.id} genre={genre} onDeleteGenreClick={handleDeleteGenreClick} onUpdateGenreClick={handleUpdateGenreClick} />
                 ))
               ) : (
                 <div className="col-12">
-                  <div className="alert alert-warning text-center">
-                    Cet auteur n'a pas encore de livres enregistrés.
+                  <div className="alert alert-info text-center">
+                    Aucun genre trouvé. Cliquez sur "Ajouter un genre" ou utilisez l'interface d'administration Django pour ajouter des genres.
                   </div>
                 </div>
               )}
@@ -153,13 +214,45 @@ export default function App() {
         )}
       </div>
 
-      {/* Formulaire modal */}
-      {showForm && (
-        <BookForm 
-          onClose={() => setShowForm(false)}
-          onSuccess={loadData}
+      {/* Modal form : AuthorForm */}
+      {showAuthorForm && (
+        <AuthorForm
+          author={selectedAuthor}
+          onClose={() => setShowAuthorForm(false)}
+          onSuccess={() => {
+            setShowAuthorForm(false);
+            loadData();
+            // refresh only if existing author updated
+            if (selectedAuthor?.id && currentView === 'author-detail') {
+              handleAuthorClick(selectedAuthor.id);
+            }
+          }}
+        />
+      )}
+
+      {/* Modal form : BookForm */}
+      {showBookForm && (
+        <BookForm
+          book={selectedBook}
+          onClose={() => setShowBookForm(false)}
+          onSuccess={() => {
+            setShowBookForm(false);
+            loadData();
+          }}
           authors={authors}
           genres={genres}
+        />
+      )}
+
+      {/* Modal form : GenreForm */}
+      {showGenreForm && (
+        <GenreForm
+          genre={selectedGenre}
+          onClose={() => setShowGenreForm(false)}
+          onSuccess={() => {
+            setShowGenreForm(false);
+            loadData();
+          }}
         />
       )}
     </div>

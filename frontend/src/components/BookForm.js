@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
-const BookForm = ({ onClose, onSuccess, authors, genres }) => {
+const BookForm = ({ onClose, onSuccess, authors, genres, book = null }) => {
+    const isEditing = book !== null;
+    const [coverImage, setCoverImage] = useState(null);
     const [formData, setFormData] = useState({
         title: '',
         pages: '',
@@ -10,20 +12,44 @@ const BookForm = ({ onClose, onSuccess, authors, genres }) => {
         author_id: ''
     });
 
+    useEffect(() => {
+        if (book) {
+            setFormData({
+                title: book.title || '',
+                pages: book.pages || '',
+                genre_id: book.genre?.id || '',
+                publication_date: book.publication_date || '',
+                author_id: book.author?.id || '',
+            });
+        }
+    }, [book]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await api.createBook({
-                ...formData,
-                pages: parseInt(formData.pages),
-                author_id: parseInt(formData.author_id)
+            const formDataToSend = new FormData();
+
+            Object.entries(formData).forEach(([key, value]) => {
+                formDataToSend.append(key, value);
             });
+
+            if (coverImage) {
+                formDataToSend.append("cover_image", coverImage);
+            }
+
+            if (isEditing) {
+                await api.updateBook(book.id, { ...formData });
+                alert('Livre modifié avec succès!');
+            } else {
+                await api.createBook(formDataToSend);
+                alert('Livre créé avec succès!');
+            }
+
             onClose();
             onSuccess();
-            alert('Livre créé avec succès!');
         } catch (error) {
-            console.error('Erreur lors de la création:', error);
-            alert('Erreur lors de la création du livre');
+            console.error(`Erreur lors de la ${isEditing ? 'modification' : 'création'}:`, error);
+            alert(`Erreur lors de la ${isEditing ? 'modification' : 'création'} du livre`);
         }
     };
 
@@ -31,14 +57,6 @@ const BookForm = ({ onClose, onSuccess, authors, genres }) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
-        });
-    };
-
-    const handleAuthorSelect = (e) => {
-        const selectedAuthors = Array.from(e.target.selectedOptions, option => option.value);
-        setFormData({
-            ...formData,
-            author_id: selectedAuthors
         });
     };
 
@@ -105,7 +123,8 @@ const BookForm = ({ onClose, onSuccess, authors, genres }) => {
                                 <select
                                     className="form-control"
                                     value={formData.author_id}
-                                    onChange={(e) => setFormData({ ...formData, author_id: e.target.value })}
+                                    name="author_id"
+                                    onChange={handleInputChange}
                                     required
                                 >
                                     <option value="">Sélectionner un auteur</option>
@@ -114,13 +133,23 @@ const BookForm = ({ onClose, onSuccess, authors, genres }) => {
                                     ))}
                                 </select>
                             </div>
+                            <div className="mb-3">
+                                <label className="form-label">Image de couverture</label>
+                                <input
+                                    type="file"
+                                    className="form-control"
+                                    name="cover_image"
+                                    accept="image/*"
+                                    onChange={(e) => setCoverImage(e.target.files[0])}
+                                />
+                            </div>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" onClick={onClose}>
                                 Annuler
                             </button>
                             <button type="submit" className="btn btn-primary">
-                                Créer le livre
+                                {isEditing ? 'Modifier' : 'Créer'} le livre
                             </button>
                         </div>
                     </form>
