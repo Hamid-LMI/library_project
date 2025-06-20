@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
-const BookForm = ({ onClose, onSuccess, authors, genres, book = null }) => {
+const BookForm = ({ onClose, onSuccess, onError, authors, genres, book = null }) => {
     const isEditing = book !== null;
     const [coverImage, setCoverImage] = useState(null);
     const [formData, setFormData] = useState({
@@ -39,17 +39,14 @@ const BookForm = ({ onClose, onSuccess, authors, genres, book = null }) => {
 
             if (isEditing) {
                 await api.updateBook(book.id, { ...formData });
-                alert('Livre modifié avec succès!');
+                onSuccess('Livre modifié avec succès!');
             } else {
                 await api.createBook(formDataToSend);
-                alert('Livre créé avec succès!');
+                onSuccess('Livre créé avec succès!');
             }
-
-            onClose();
-            onSuccess();
         } catch (error) {
             console.error(`Erreur lors de la ${isEditing ? 'modification' : 'création'}:`, error);
-            alert(`Erreur lors de la ${isEditing ? 'modification' : 'création'} du livre`);
+            onError(`Erreur lors de la ${isEditing ? 'modification' : 'création'} du livre`);
         }
     };
 

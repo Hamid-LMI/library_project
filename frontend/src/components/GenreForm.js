@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import api from '../services/api';
 
-const GenreForm = ({ onClose, onSuccess, genre = null }) => {
+const GenreForm = ({ onClose, onSuccess, onError, genre = null }) => {
     const [formData, setFormData] = useState(genre || {name: '' });
 
     const isEditing = genre !== null;
@@ -11,16 +11,14 @@ const GenreForm = ({ onClose, onSuccess, genre = null }) => {
         try {
             if (isEditing) {
                 await api.updateGenre(genre.id, { ...formData });
-                alert('Genre modifié avec succès!');
+                onSuccess('Genre modifié avec succès!');
             } else {
                 await api.createGenre({ ...formData });
-                alert('Genre créé avec succès!');
+                onSuccess('Genre créé avec succès!');
             }
-            onClose();
-            onSuccess();
         } catch (error) {
             console.error(`Erreur lors de la ${isEditing ? 'modification' : 'création'}:`, error);
-            alert(`Erreur lors de la ${isEditing ? 'modification' : 'création'} du genre`);
+            onError(`Erreur lors de la ${isEditing ? 'modification' : 'création'} du genre`);
         }
     };
 

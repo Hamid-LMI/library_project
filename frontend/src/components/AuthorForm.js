@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import api from '../services/api';
 
-const AuthorForm = ({ onClose, onSuccess, author = null }) => {
+const AuthorForm = ({ onClose, onSuccess, onError, author = null }) => {
     const [formData, setFormData] = useState(author || {
         first_name: '',
         last_name: '',
@@ -15,16 +15,14 @@ const AuthorForm = ({ onClose, onSuccess, author = null }) => {
         try {
             if (isEditing) {
                 await api.updateAuthor(author.id, { ...formData });
-                alert('Auteur modifié avec succès!');
+                onSuccess("Auteur modifié avec succès !");
             } else {
                 await api.createAuthor({ ...formData });
-                alert('Auteur créé avec succès!');
+                onSuccess("Auteur créé avec succès !");
             }
-            
-            onSuccess();
         } catch (error) {
             console.error(`Erreur lors de la ${isEditing ? 'modification' : 'création'}:`, error);
-            alert(`Erreur lors de la ${isEditing ? 'modification' : 'création'} de l'auteur`);
+            onError(`Erreur lors de la ${isEditing ? 'modification' : 'création'} de l'auteur`);
         }
     };
 

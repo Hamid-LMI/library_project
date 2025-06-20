@@ -9,6 +9,11 @@ import BookForm from './components/BookForm';
 import GenreForm from './components/GenreForm';
 import AuthorDetails from './components/AuthorDetails';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
 import './App.css';
 
 export default function App() {
@@ -27,6 +32,8 @@ export default function App() {
   useEffect(() => {
     loadData();
   }, []);
+
+  const MySwal = withReactContent(Swal);
 
   const loadData = async () => {
     setLoading(true);
@@ -58,13 +65,28 @@ export default function App() {
   };
 
   const handleDeleteAuthorClick = async (authorId) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
+    const result = await MySwal.fire({
+      title: 'Confirmer la suppression',
+      text: "Êtes-vous sûr de vouloir supprimer cet élément ?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Oui, supprimer',
+      cancelButtonText: 'Annuler',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+    });
+    if (result.isConfirmed) {
       try {
         const authorData = await api.deleteAuthor(authorId);
         loadData();
         setCurrentView("authors");
+
+        setTimeout(() => {
+          toast.success('Auteur supprimé avec Succès !');
+        }, 200);
       } catch (error) {
         console.error('Erreur lors de la supression de l\'auteur:', error);
+        toast.error('Erreur lors de la supression de l\'auteur.');
       }
     }
   };
@@ -75,12 +97,27 @@ export default function App() {
   };
 
   const handleDeleteGenreClick = async (genreId) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
+    const result = await MySwal.fire({
+      title: 'Confirmer la suppression',
+      text: "Êtes-vous sûr de vouloir supprimer cet élément ?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Oui, supprimer',
+      cancelButtonText: 'Annuler',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+    });
+    if (result.isConfirmed) {
       try {
         const genreData = await api.deleteGenre(genreId);
         loadData();
+
+        setTimeout(() => {
+          toast.success('Genre supprimé avec Succès !');
+        }, 200);
       } catch (error) {
         console.error('Erreur lors de la supression du genre:', error);
+        toast.error('Erreur lors de la supression du genre.');
       }
     }
   };
@@ -91,12 +128,27 @@ export default function App() {
   };
 
   const handleDeleteBookClick = async (bookId) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
+    const result = await MySwal.fire({
+      title: 'Confirmer la suppression',
+      text: "Êtes-vous sûr de vouloir supprimer cet élément ?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Oui, supprimer',
+      cancelButtonText: 'Annuler',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+    });
+    if (result.isConfirmed) {
       try {
         const bookData = await api.deleteBook(bookId);
         loadData();
+
+        setTimeout(() => {
+          toast.success('Livre supprimé avec Succès !');
+        }, 200);
       } catch (error) {
         console.error('Erreur lors de la supression du livre:', error);
+        toast.error('Erreur lors de la supression du livre.');
       }
     }
   };
@@ -219,14 +271,22 @@ export default function App() {
         <AuthorForm
           author={selectedAuthor}
           onClose={() => setShowAuthorForm(false)}
-          onSuccess={() => {
+          onSuccess={(message) => {
             setShowAuthorForm(false);
             loadData();
+
             // refresh only if existing author updated
             if (selectedAuthor?.id && currentView === 'author-detail') {
               handleAuthorClick(selectedAuthor.id);
             }
+
+            if (message) {
+              setTimeout(() => {
+                toast.success(message);
+              }, 200);
+            }
           }}
+          onError={(message) => toast.error(message)}
         />
       )}
 
@@ -235,10 +295,17 @@ export default function App() {
         <BookForm
           book={selectedBook}
           onClose={() => setShowBookForm(false)}
-          onSuccess={() => {
+          onSuccess={(message) => {
             setShowBookForm(false);
             loadData();
+
+            if (message) {
+              setTimeout(() => {
+                toast.success(message);
+              }, 200);
+            }
           }}
+          onError={(message) => toast.error(message)}
           authors={authors}
           genres={genres}
         />
@@ -249,12 +316,32 @@ export default function App() {
         <GenreForm
           genre={selectedGenre}
           onClose={() => setShowGenreForm(false)}
-          onSuccess={() => {
+          onSuccess={(message) => {
             setShowGenreForm(false);
             loadData();
+
+            if (message) {
+              setTimeout(() => {
+                toast.success(message);
+              }, 200);
+            }
           }}
+          onError={(message) => toast.error(message)}
         />
       )}
+
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
+
   );
 }
