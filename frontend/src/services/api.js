@@ -48,7 +48,7 @@ const api = {
     const config = data instanceof FormData ? {
       headers: { 'Content-Type': 'multipart/form-data' }
     } : {};
-    axiosInstance.put(`/books/${id}/`, data).then(res => res.data)
+    axiosInstance.put(`/books/${id}/`, data, config).then(res => res.data)
   },
   updateAuthor: (id, data) => axiosInstance.put(`/authors/${id}/`, data).then(res => res.data),
 

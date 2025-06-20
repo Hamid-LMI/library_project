@@ -38,7 +38,7 @@ const BookForm = ({ onClose, onSuccess, onError, authors, genres, book = null })
             }
 
             if (isEditing) {
-                await api.updateBook(book.id, { ...formData });
+                await api.updateBook(book.id, formDataToSend);
                 onSuccess('Livre modifié avec succès!');
             } else {
                 await api.createBook(formDataToSend);

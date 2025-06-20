@@ -296,8 +296,10 @@ export default function App() {
           book={selectedBook}
           onClose={() => setShowBookForm(false)}
           onSuccess={(message) => {
+            setTimeout(() => {
+              loadData();
+            }, 50);
             setShowBookForm(false);
-            loadData();
 
             if (message) {
               setTimeout(() => {
