@@ -9,6 +9,7 @@ db.sqlite3
 
 # Django
 /static/
+media/
 *.log
 
 # React
